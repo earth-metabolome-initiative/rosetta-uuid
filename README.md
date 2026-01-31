@@ -1,6 +1,6 @@
 # rosetta-uuid
 
-[![CI](https://github.com/earth-metabolome-initiative/rosetta-uuid/workflows/ci/badge.svg)](https://github.com/earth-metabolome-initiative/rosetta-uuid/actions)
+[![CI](https://github.com/earth-metabolome-initiative/rosetta-uuid/actions/workflows/ci.yml/badge.svg)](https://github.com/earth-metabolome-initiative/rosetta-uuid/actions/workflows/ci.yml)
 [![Security Audit](https://github.com/earth-metabolome-initiative/rosetta-uuid/workflows/Security%20Audit/badge.svg)](https://github.com/earth-metabolome-initiative/rosetta-uuid/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Codecov](https://codecov.io/gh/earth-metabolome-initiative/rosetta-uuid/branch/main/graph/badge.svg)](https://codecov.io/gh/earth-metabolome-initiative/rosetta-uuid)
@@ -56,12 +56,3 @@ The `Uuid` type implements:
 * `From<uuid::Uuid>`, `Into<uuid::Uuid>`
 * `From<[u8; 16]>`, `Into<[u8; 16]>`
 * `Default` (returns nil UUID)
-
-## Relevant Resources
-
-* [uuid crate documentation](https://docs.rs/uuid)
-* [diesel crate documentation](https://docs.rs/diesel)
-* [redis crate documentation](https://docs.rs/redis)
-* [serde crate documentation](https://docs.rs/serde)
-* [PostgreSQL UUID type documentation](https://www.postgresql.org/docs/current/datatype-uuid.html)
-* [SQLite Datatypes](https://www.sqlite.org/datatype3.html)
