@@ -90,4 +90,41 @@ mod tests {
         let parsed_status = crate::Uuid::from_redis_value(val_status).unwrap();
         assert_eq!(id, parsed_status);
     }
+
+    #[test]
+    fn test_invalid_length_bytes() {
+        // 15 bytes - not 16, so it tries string parsing.
+        // It's not a valid UUID string either.
+        let bytes = vec![0u8; 15];
+        let val = Value::BulkString(bytes);
+        assert!(crate::Uuid::from_redis_value(val).is_err());
+    }
+
+    #[test]
+    fn test_invalid_utf8() {
+        // Not 16 bytes, and invalid UTF-8
+        let bytes = vec![0xff, 0xff, 0xff];
+        let val = Value::BulkString(bytes);
+        assert!(crate::Uuid::from_redis_value(val).is_err());
+    }
+
+    #[test]
+    fn test_invalid_string_content() {
+        let s = "not-a-uuid";
+
+        let val1 = Value::BulkString(s.as_bytes().to_vec());
+        assert!(crate::Uuid::from_redis_value(val1).is_err());
+
+        let val2 = Value::SimpleString(s.to_string());
+        assert!(crate::Uuid::from_redis_value(val2).is_err());
+    }
+
+    #[test]
+    fn test_wrong_type() {
+        let val = Value::Int(42);
+        assert!(crate::Uuid::from_redis_value(val).is_err());
+
+        let val = Value::Nil;
+        assert!(crate::Uuid::from_redis_value(val).is_err());
+    }
 }
