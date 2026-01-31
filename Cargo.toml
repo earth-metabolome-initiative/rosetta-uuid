@@ -1,0 +1,50 @@
+[package]
+name = "rosetta-uuid"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+uuid = { version = "1.20", features = ["serde", "v4", "v7"] }
+diesel = { version = "2.3.6", git = "https://github.com/LucaCappelletti94/diesel", branch = "future3", optional = true, features = [
+	"uuid",
+] }
+serde = { version = "1.0", optional = true, features = ["derive"] }
+redis = { version = "1.0.3", optional = true }
+chrono = "0.4"
+
+[features]
+default = []
+serde = ["dep:serde"]
+diesel = ["dep:diesel"]
+postgres = ["diesel", "diesel/postgres"]
+sqlite = ["diesel", "diesel/sqlite"]
+redis = ["dep:redis"]
+
+[lints.rust]
+missing_docs = "forbid"
+unused_macro_rules = "forbid"
+unconditional_recursion = "forbid"
+unreachable_patterns = "forbid"
+unused_import_braces = "forbid"
+unused_must_use = "forbid"
+deprecated = "deny"
+
+[lints.rustdoc]
+broken_intra_doc_links = "forbid"
+bare_urls = "forbid"
+invalid_codeblock_attributes = "forbid"
+invalid_html_tags = "forbid"
+missing_crate_level_docs = "forbid"
+unescaped_backticks = "forbid"
+redundant_explicit_links = "forbid"
+invalid_rust_codeblocks = "forbid"
+
+[lints.clippy]
+unreadable_literal = "allow"
+missing_panics_doc = "allow"
+new_ret_no_self = "allow"
+struct_excessive_bools = "allow"
+should_panic_without_expect = "allow"
+doc_markdown = "allow"
+clone_on_copy = "forbid"
+pedantic = { level = "deny", priority = -1 }
