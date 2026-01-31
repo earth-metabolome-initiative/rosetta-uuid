@@ -216,20 +216,20 @@ mod tests {
 
         // DerefMut (modifying internally to nil just as a test)
         *uuid = uuid::Uuid::nil();
-        assert_eq!(uuid.is_nil(), true);
+        assert!(uuid.is_nil());
     }
 
     #[test]
     fn test_display() {
         let s = "67e55044-10b1-426f-9247-bb680e5fe0c8";
         let uuid = Uuid::from_str(s).unwrap();
-        assert_eq!(format!("{}", uuid), s);
+        assert_eq!(format!("{uuid}"), s);
     }
 
     #[test]
     fn test_standard_traits() {
         let uuid1 = Uuid::new_v4();
-        let uuid2 = uuid1.clone(); // Clone
+        let uuid2 = Clone::clone(&uuid1); // Clone
         let uuid3 = uuid1; // Copy
 
         assert_eq!(uuid1, uuid2); // PartialEq

@@ -26,14 +26,17 @@ mod tests {
     use diesel::prelude::*;
     use std::env;
 
+    #[derive(QueryableByName, Debug, PartialEq)]
+    struct Row {
+        #[diesel(sql_type = crate::diesel_impls::Uuid)]
+        id: Uuid,
+    }
+
     #[test]
     fn test_postgres_roundtrip() {
-        let database_url = match env::var("DATABASE_URL") {
-            Ok(url) => url,
-            Err(_) => {
-                eprintln!("Skipping test_postgres_roundtrip: DATABASE_URL not set");
-                return;
-            }
+        let Ok(database_url) = env::var("DATABASE_URL") else {
+            eprintln!("Skipping test_postgres_roundtrip: DATABASE_URL not set");
+            return;
         };
 
         let mut conn = PgConnection::establish(&database_url).unwrap();
@@ -41,12 +44,6 @@ mod tests {
         diesel::sql_query("CREATE TEMPORARY TABLE test_table (id UUID PRIMARY KEY)")
             .execute(&mut conn)
             .unwrap();
-
-        #[derive(QueryableByName, Debug, PartialEq)]
-        struct Row {
-            #[diesel(sql_type = crate::diesel_impls::Uuid)]
-            id: Uuid,
-        }
 
         let uuid = Uuid::new_v4();
 

@@ -29,6 +29,12 @@ mod tests {
     use diesel::prelude::*;
     use diesel::sqlite::SqliteConnection;
 
+    #[derive(QueryableByName, Debug, PartialEq)]
+    struct Row {
+        #[diesel(sql_type = crate::diesel_impls::Uuid)]
+        id: Uuid,
+    }
+
     #[test]
     fn test_sqlite_roundtrip() {
         let mut conn = SqliteConnection::establish(":memory:").unwrap();
@@ -36,12 +42,6 @@ mod tests {
         diesel::sql_query("CREATE TABLE test_table (id BLOB PRIMARY KEY)")
             .execute(&mut conn)
             .unwrap();
-
-        #[derive(QueryableByName, Debug, PartialEq)]
-        struct Row {
-            #[diesel(sql_type = crate::diesel_impls::Uuid)]
-            id: Uuid,
-        }
 
         let uuid = Uuid::new_v4();
 
