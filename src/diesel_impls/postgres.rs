@@ -22,7 +22,7 @@ impl diesel::serialize::ToSql<crate::diesel_impls::Uuid, diesel::pg::Pg> for cra
 #[cfg(test)]
 mod tests {
     use crate::Uuid;
-    use core::env;
+    use std::env;
     use diesel::pg::PgConnection;
     use diesel::prelude::*;
 
