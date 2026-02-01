@@ -19,6 +19,26 @@ impl diesel::serialize::ToSql<crate::diesel_impls::Uuid, diesel::pg::Pg> for cra
     }
 }
 
+impl diesel::deserialize::FromSql<diesel::sql_types::Binary, diesel::pg::Pg> for crate::Uuid {
+    fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
+        uuid::Uuid::from_slice(value.as_bytes())
+            .map_err(Into::into)
+            .map(Self::from)
+    }
+}
+
+impl diesel::serialize::ToSql<diesel::sql_types::Binary, diesel::pg::Pg> for crate::Uuid {
+    fn to_sql<'b>(
+        &'b self,
+        out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>,
+    ) -> diesel::serialize::Result {
+        use std::io::Write;
+        out.write_all(self.as_bytes())
+            .map(|()| diesel::serialize::IsNull::No)
+            .map_err(Into::into)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::Uuid;
@@ -54,6 +74,39 @@ mod tests {
 
         let result = diesel::sql_query("SELECT id FROM test_table")
             .get_result::<Row>(&mut conn)
+            .unwrap();
+
+        assert_eq!(result.id, uuid);
+    }
+
+    #[derive(QueryableByName, Debug, PartialEq)]
+    struct RowBinary {
+        #[diesel(sql_type = diesel::sql_types::Binary)]
+        id: Uuid,
+    }
+
+    #[test]
+    fn test_postgres_binary_roundtrip() {
+        let Ok(database_url) = env::var("DATABASE_URL") else {
+            eprintln!("Skipping test_postgres_binary_roundtrip: DATABASE_URL not set");
+            return;
+        };
+
+        let mut conn = PgConnection::establish(&database_url).unwrap();
+
+        diesel::sql_query("CREATE TEMPORARY TABLE test_table_binary (id BYTEA PRIMARY KEY)")
+            .execute(&mut conn)
+            .unwrap();
+
+        let uuid = Uuid::new_v4();
+
+        diesel::sql_query("INSERT INTO test_table_binary (id) VALUES ($1)")
+            .bind::<diesel::sql_types::Binary, _>(uuid)
+            .execute(&mut conn)
+            .unwrap();
+
+        let result = diesel::sql_query("SELECT id FROM test_table_binary")
+            .get_result::<RowBinary>(&mut conn)
             .unwrap();
 
         assert_eq!(result.id, uuid);
