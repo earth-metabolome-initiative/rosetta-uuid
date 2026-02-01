@@ -7,7 +7,7 @@
 [![Crates.io](https://img.shields.io/crates/v/rosetta-uuid.svg)](https://crates.io/crates/rosetta-uuid)
 [![Docs.rs](https://docs.rs/rosetta-uuid/badge.svg)](https://docs.rs/rosetta-uuid)
 
-A wrapper implementation of UUID providing binary `diesel` bindings for SQLite and PostgreSQL, and `redis` serialization support.
+A wrapper implementation of UUID providing binary [`diesel`](https://crates.io/crates/diesel) bindings for SQLite and PostgreSQL, and [`redis`](https://crates.io/crates/redis) serialization support.
 
 ## Features
 
@@ -51,7 +51,7 @@ let parsed = Uuid::from_str("67e55044-10b1-426f-9247-bb680e5fe0c8").unwrap();
 println!("Version: {:?}", id.get_version());
 ```
 
-To use the functions made available by this crate as a `SQLite` registered function, you can use:
+To use the functions made available by this crate [as a `SQLite` registered function](https://docs.diesel.rs/main/diesel_derives/attr.declare_sql_function.html#use-with-sqlite), you can use:
 
 ```rust
 #[cfg(feature = "sqlite")]
