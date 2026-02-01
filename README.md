@@ -32,7 +32,7 @@ rosetta-uuid = { version = "0.1", features = ["diesel", "postgres", "redis", "se
 
 ```rust
 use rosetta_uuid::Uuid;
-use std::str::FromStr;
+use core::str::FromStr;
 
 // Create a new random UUID (v4)
 let id = Uuid::new_v4();

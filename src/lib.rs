@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 
-use std::str::FromStr;
+use core::str::FromStr;
 
 pub mod diesel_impls;
 mod redis;

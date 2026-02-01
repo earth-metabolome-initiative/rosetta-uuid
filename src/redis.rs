@@ -24,7 +24,7 @@ impl FromRedisValue for crate::Uuid {
                 }
 
                 // Otherwise try to interpret as a string.
-                let s = std::str::from_utf8(&bytes).map_err(|_| {
+                let s = core::str::from_utf8(&bytes).map_err(|_| {
                     redis::ParsingError::from("Invalid UTF-8 sequence for UUID string")
                 })?;
 

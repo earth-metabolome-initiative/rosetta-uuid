@@ -22,9 +22,9 @@ impl diesel::serialize::ToSql<crate::diesel_impls::Uuid, diesel::pg::Pg> for cra
 #[cfg(test)]
 mod tests {
     use crate::Uuid;
+    use core::env;
     use diesel::pg::PgConnection;
     use diesel::prelude::*;
-    use std::env;
 
     #[derive(QueryableByName, Debug, PartialEq)]
     struct Row {
