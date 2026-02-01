@@ -51,6 +51,33 @@ let parsed = Uuid::from_str("67e55044-10b1-426f-9247-bb680e5fe0c8").unwrap();
 println!("Version: {:?}", id.get_version());
 ```
 
+To use the functions made available by this crate as a `SQLite` registered function, you can use:
+
+```rust
+#[cfg(feature = "sqlite")]
+fn main() {
+  use diesel::{SqliteConnection, Connection};
+  #[diesel::declare_sql_function]
+  extern "SQL" {
+      /// Generates a UUID v4
+      fn uuidv4() -> Binary;
+      /// Generates a UUID v7
+      fn uuidv7() -> Binary;
+  }
+
+  let mut connection = SqliteConnection::establish(":memory:")
+      .expect("Failed to create in-memory SQLite database");
+
+  uuidv4_utils::register_impl(&connection, rosetta_uuid::Uuid::new_v4)
+      .expect("Failed to register uuidv4");
+  uuidv7_utils::register_impl(&connection, rosetta_uuid::Uuid::utc_v7)
+      .expect("Failed to register uuidv7");
+}
+
+#[cfg(not(feature = "sqlite"))]
+fn main() {}
+```
+
 ## Traits
 
 The `Uuid` type implements:
