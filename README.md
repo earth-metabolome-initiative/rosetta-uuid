@@ -4,6 +4,8 @@
 [![Security Audit](https://github.com/earth-metabolome-initiative/rosetta-uuid/workflows/Security%20Audit/badge.svg)](https://github.com/earth-metabolome-initiative/rosetta-uuid/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Codecov](https://codecov.io/gh/earth-metabolome-initiative/rosetta-uuid/branch/main/graph/badge.svg)](https://codecov.io/gh/earth-metabolome-initiative/rosetta-uuid)
+[![Crates.io](https://img.shields.io/crates/v/rosetta-uuid.svg)](https://crates.io/crates/rosetta-uuid)
+[![Docs.rs](https://docs.rs/rosetta-uuid/badge.svg)](https://docs.rs/rosetta-uuid)
 
 A wrapper implementation of UUID providing binary `diesel` bindings for SQLite and PostgreSQL, and `redis` serialization support.
 
