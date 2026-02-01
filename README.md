@@ -19,6 +19,10 @@ This crate provides a `Uuid` wrapper type that implements various traits based o
 * **[`redis`](https://crates.io/crates/redis)**: Enables `ToRedisArgs` and `FromRedisValue` for easy [Redis](https://redis.io/) storage and retrieval.
 * **[`serde`](https://crates.io/crates/serde)**: Enables serialization and deserialization via [Serde](https://serde.rs/).
 
+## Platform Support
+
+* **Wasm**: Verified support for `wasm32-unknown-unknown` with `uuid` v4 and v7 generation.
+
 ## Usage
 
 Add this to your `Cargo.toml`. Select the features matching your database or storage requirements.

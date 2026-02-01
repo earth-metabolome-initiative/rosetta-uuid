@@ -55,3 +55,10 @@ should_panic_without_expect = "allow"
 doc_markdown = "allow"
 clone_on_copy = "forbid"
 pedantic = { level = "deny", priority = -1 }
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies]
+wasm-bindgen-test = "0.3"
+uuid = { version = "1.20", features = ["js"] }
