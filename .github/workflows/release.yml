@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --all-features --all-targets -- -D warnings
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
+      - uses: Swatinem/rust-cache@v2
+      - name: Check documentation
+        run: cargo doc --no-deps --document-private-items
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  test:
+    name: Test (all features)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
+      - uses: Swatinem/rust-cache@v2
+      - name: Run tests
+        run: cargo test --no-default-features --features "diesel,postgres,sqlite,redis,serde"
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/postgres
+          REDIS_URL: redis://127.0.0.1/
+
+  test_wasm:
+    name: Test Wasm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Run Wasm Tests (Firefox)
+        run: wasm-pack test --headless --firefox
+      - name: Run Wasm Tests with diesel + sqlite (Firefox)
+        run: wasm-pack test --headless --firefox -- --features diesel,sqlite
+
+  publish:
+    name: Publish to crates.io
+    needs: [fmt, clippy, doc, test, test_wasm]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Authenticate to crates.io (Trusted Publishing)
+        uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Publish
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
