@@ -1,0 +1,5 @@
+# getrandom 0.4 needs an explicit backend on wasm32-unknown-unknown. The wasm_js
+# backend routes through crypto.getRandomValues, available in both Window and
+# Worker contexts, which is what uuid 1.24's rng-getrandom feature relies on.
+[target.wasm32-unknown-unknown]
+rustflags = ['--cfg', 'getrandom_backend="wasm_js"']

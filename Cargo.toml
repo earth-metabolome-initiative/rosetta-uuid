@@ -11,7 +11,7 @@ keywords = ["uuid", "diesel", "redis", "postgres", "sqlite"]
 categories = ["database", "data-structures", "encoding"]
 
 [dependencies]
-uuid = { version = "1.20", features = ["serde", "v4", "v7"] }
+uuid = { version = "1.24", features = ["serde", "v4", "v7", "rng-getrandom"] }
 diesel = { version = "2.3.6", git = "https://github.com/LucaCappelletti94/diesel", branch = "future3", optional = true, features = [
 	"uuid",
 ] }
@@ -57,8 +57,10 @@ clone_on_copy = "forbid"
 pedantic = { level = "deny", priority = -1 }
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
-getrandom = { version = "0.2", features = ["js"] }
+# uuid 1.24 routes wasm randomness through uuid-rng-internal, which re-exports
+# getrandom 0.4. Enable its wasm_js backend so new_v4/new_v7 use crypto.getRandomValues.
+# Consumers MUST also set RUSTFLAGS='--cfg getrandom_backend="wasm_js"' (see README).
+getrandom = { version = "0.4", features = ["wasm_js"] }
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies]
 wasm-bindgen-test = "0.3"
-uuid = { version = "1.20", features = ["js"] }

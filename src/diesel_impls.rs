@@ -14,8 +14,8 @@ mod sqlite;
 ///
 /// - [`uuid::Uuid`][Uuid]
 ///
-/// [`ToSql`]: crate::serialize::ToSql
-/// [`FromSql`]: crate::deserialize::FromSql
+/// [`ToSql`]: diesel::serialize::ToSql
+/// [`FromSql`]: diesel::deserialize::FromSql
 /// [Uuid]: https://docs.rs/uuid/*/uuid/struct.Uuid.html
 /// [`UUID`]: https://www.postgresql.org/docs/current/datatype-uuid.html
 #[derive(
@@ -27,3 +27,9 @@ mod sqlite;
 )]
 #[cfg_attr(feature = "sqlite", diesel(sqlite_type(name = "Binary")))]
 pub struct Uuid;
+
+/// Enables `MAX`/`MIN` aggregates and ordering comparisons (`.gt()`, `.lt()`,
+/// `.between()`) on the [`Uuid`] SQL type. SQLite orders `BLOB` by `memcmp`,
+/// PostgreSQL `uuid` has a total order, and a v7 uuid sorts by its embedded
+/// timestamp, so these mean "newest/oldest by creation time".
+impl diesel::sql_types::SqlOrd for Uuid {}

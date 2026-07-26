@@ -177,3 +177,5 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Run Wasm Tests (Firefox)
         run: wasm-pack test --headless --firefox
+      - name: Run Wasm Tests with diesel + sqlite (Firefox)
+        run: wasm-pack test --headless --firefox -- --features diesel,sqlite

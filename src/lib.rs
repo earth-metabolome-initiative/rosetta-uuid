@@ -5,6 +5,13 @@ use core::str::FromStr;
 pub mod diesel_impls;
 mod redis;
 
+/// Public alias for the SQL types this crate defines, for use in `diesel::table!`
+/// schemas as `id -> rosetta_uuid::sql_types::Uuid`.
+#[cfg(feature = "diesel")]
+pub mod sql_types {
+    pub use crate::diesel_impls::Uuid;
+}
+
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(
@@ -234,7 +241,7 @@ mod tests {
 
         assert_eq!(uuid1, uuid2); // PartialEq
         assert_eq!(uuid1, uuid3); // PartialEq
-        assert!(uuid1 == uuid2); // Eq check implicitly
+        assert_eq!(uuid1, uuid2); // Eq check implicitly
 
         let mut set = HashSet::new();
         set.insert(uuid1); // Hash
@@ -259,5 +266,21 @@ mod tests {
         // Version v7 might check differently depending on uuid crate version
         // assert_eq!(v7.get_version(), Some(uuid::Version::Sortable));
         assert!(!v7.is_nil());
+    }
+
+    #[cfg(feature = "sqlite")]
+    #[test]
+    fn uuid_sql_type_supports_max_and_ordering() {
+        use diesel::prelude::*;
+
+        diesel::table! {
+            items (id) {
+                id -> crate::diesel_impls::Uuid,
+            }
+        }
+
+        // These typed forms only compile because `diesel_impls::Uuid: SqlOrd`.
+        let _max = items::table.select(diesel::dsl::max(items::id));
+        let _cmp = items::table.filter(items::id.gt(Uuid::new_v4()));
     }
 }

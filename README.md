@@ -21,7 +21,12 @@ This crate provides a `Uuid` wrapper type that implements various traits based o
 
 ## Platform Support
 
-* **Wasm**: Verified support for `wasm32-unknown-unknown` with `uuid` v4 and v7 generation.
+On `wasm32-unknown-unknown` the `v4` and `v7` generators draw randomness from the browser CSPRNG (`crypto.getRandomValues`), which works in both `Window` and dedicated `Worker` contexts. This routes through `uuid` 1.24's `rng-getrandom` feature and `getrandom` 0.4's `wasm_js` backend, which is opt-in via a cfg flag. Consuming wasm apps MUST set it, for example in `.cargo/config.toml`:
+
+```toml
+[target.wasm32-unknown-unknown]
+rustflags = ['--cfg', 'getrandom_backend="wasm_js"']
+```
 
 ## Usage
 
@@ -68,9 +73,13 @@ fn main() {
   let mut connection = SqliteConnection::establish(":memory:")
       .expect("Failed to create in-memory SQLite database");
 
-  uuidv4_utils::register_impl(&connection, rosetta_uuid::Uuid::new_v4)
+  // Register as NONDETERMINISTIC. A UUID generator used in a column
+  // DEFAULT (uuidv7()) MUST be nondeterministic: a deterministic function
+  // may be constant-folded by SQLite, so every row inserted without an
+  // explicit id would receive the SAME uuid.
+  uuidv4_utils::register_nondeterministic_impl(&connection, rosetta_uuid::Uuid::new_v4)
       .expect("Failed to register uuidv4");
-  uuidv7_utils::register_impl(&connection, rosetta_uuid::Uuid::utc_v7)
+  uuidv7_utils::register_nondeterministic_impl(&connection, rosetta_uuid::Uuid::utc_v7)
       .expect("Failed to register uuidv7");
 }
 
