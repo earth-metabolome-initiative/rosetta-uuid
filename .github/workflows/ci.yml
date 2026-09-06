@@ -9,12 +9,15 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: read
+
 jobs:
   fmt:
     name: Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
@@ -24,24 +27,24 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - run: cargo clippy --all-features --all-targets -- -D warnings
 
   doc:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Check documentation
         run: cargo doc --no-deps --document-private-items
         env:
@@ -93,11 +96,11 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Run Tests
         run: cargo test --no-default-features --features "${{ matrix.features }}"
         env:
@@ -112,9 +115,9 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       # Just build default features to ensure portability.
       # Integration tests are skipped because services (Postgres/Redis) are tricky on these runners.
       - name: Build
@@ -143,7 +146,7 @@ jobs:
           - 6379:6379
           
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -152,14 +155,14 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
       - name: Install tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Generate coverage
         run: cargo tarpaulin --all-features --engine=llvm --out xml --workspace --run-types AllTargets --run-types Doctests
         env:
           DATABASE_URL: postgres://postgres@localhost:5432/postgres
           REDIS_URL: redis://127.0.0.1/
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -168,13 +171,13 @@ jobs:
     name: Test Wasm
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
       - name: Install wasm-pack
-        uses: jetli/wasm-pack-action@v0.4.0
-      - uses: Swatinem/rust-cache@v2
+        uses: jetli/wasm-pack-action@0d096b08b4e5a7de8c28de67e11e945404e9eefa # v0.4.0
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Run Wasm Tests (Firefox)
         run: wasm-pack test --headless --firefox
       - name: Run Wasm Tests with diesel + sqlite (Firefox)
