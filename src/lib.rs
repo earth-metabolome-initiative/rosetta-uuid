@@ -236,7 +236,7 @@ mod tests {
     #[test]
     fn test_standard_traits() {
         let uuid1 = Uuid::new_v4();
-        let uuid2 = Clone::clone(&uuid1); // Clone
+        let uuid2 = uuid1; // Clone, which for a Copy type is the copy
         let uuid3 = uuid1; // Copy
 
         assert_eq!(uuid1, uuid2); // PartialEq

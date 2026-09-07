@@ -12,7 +12,7 @@ categories = ["database", "data-structures", "encoding"]
 
 [dependencies]
 uuid = { version = "1.24", features = ["serde", "v4", "v7", "rng-getrandom"] }
-diesel = { version = "2.3.6", git = "https://github.com/LucaCappelletti94/diesel", branch = "future3", optional = true, features = [
+diesel = { version = "2.3.13", optional = true, features = [
 	"uuid",
 ] }
 serde = { version = "1.0", optional = true, features = ["derive"] }

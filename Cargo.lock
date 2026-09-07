@@ -152,8 +152,9 @@ checksum = "7cd812cc2bc1d69d4764bd80df88b4317eaef9e773c75226407d9bc0876b211c"
 
 [[package]]
 name = "diesel"
-version = "2.3.6"
-source = "git+https://github.com/LucaCappelletti94/diesel?branch=future3#b86fa9881c13e379dc196ad1dcdcba544b27548d"
+version = "2.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3b934ddbdcb2abb9f9fc9c30bd47bcc5618b615eea1d334cda5fdf8ff9b072a"
 dependencies = [
  "bitflags",
  "byteorder",
@@ -162,7 +163,6 @@ dependencies = [
  "itoa",
  "libsqlite3-sys",
  "pq-sys",
- "serde_json",
  "sqlite-wasm-rs",
  "time",
  "uuid",
@@ -170,8 +170,9 @@ dependencies = [
 
 [[package]]
 name = "diesel_derives"
-version = "2.3.7"
-source = "git+https://github.com/LucaCappelletti94/diesel?branch=future3#b86fa9881c13e379dc196ad1dcdcba544b27548d"
+version = "2.3.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ecbd51fb6c020672543641167efa4e6417ff7ad76849ed556ace3595e72de03a"
 dependencies = [
  "diesel_table_macro_syntax",
  "dsl_auto_type",
@@ -183,7 +184,8 @@ dependencies = [
 [[package]]
 name = "diesel_table_macro_syntax"
 version = "0.3.0"
-source = "git+https://github.com/LucaCappelletti94/diesel?branch=future3#b86fa9881c13e379dc196ad1dcdcba544b27548d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe2444076b48641147115697648dc743c2c00b61adade0f01ce67133c7babe8c"
 dependencies = [
  "syn",
 ]
@@ -208,7 +210,8 @@ checksum = "117240f60069e65410b3ae1bb213295bd828f707b5bec6596a1afc8793ce0cbc"
 [[package]]
 name = "dsl_auto_type"
 version = "0.2.0"
-source = "git+https://github.com/LucaCappelletti94/diesel?branch=future3#b86fa9881c13e379dc196ad1dcdcba544b27548d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd122633e4bef06db27737f21d3738fb89c8f6d5360d6d9d7635dda142a7757e"
 dependencies = [
  "darling",
  "either",
