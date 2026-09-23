@@ -50,7 +50,8 @@ impl Uuid {
     }
 
     #[must_use]
-    /// Creates a new `Uuid` using the `uuid` crate's `new_v7` method with the current UTC timestamp.
+    /// Creates a new version 7 `Uuid` from the current time, strictly increasing
+    /// across calls within this process.
     ///
     /// # Examples
     ///
@@ -60,14 +61,7 @@ impl Uuid {
     /// let uuid = Uuid::utc_v7();
     /// ```
     pub fn utc_v7() -> Self {
-        let utc_now = ::chrono::Utc::now();
-        ::uuid::Uuid::new_v7(::uuid::Timestamp::from_unix_time(
-            u64::try_from(utc_now.timestamp()).expect("Time went backwards"),
-            utc_now.timestamp_subsec_nanos(),
-            0,
-            12,
-        ))
-        .into()
+        Self(uuid::Uuid::now_v7())
     }
 }
 
@@ -263,9 +257,13 @@ mod tests {
         assert_eq!(v4.get_version(), Some(uuid::Version::Random));
 
         let v7 = Uuid::utc_v7();
-        // Version v7 might check differently depending on uuid crate version
-        // assert_eq!(v7.get_version(), Some(uuid::Version::Sortable));
-        assert!(!v7.is_nil());
+        assert_eq!(v7.get_version(), Some(uuid::Version::SortRand));
+    }
+
+    #[test]
+    fn utc_v7_orders_ids_minted_within_one_millisecond() {
+        let ids: Vec<Uuid> = (0..1000).map(|_| Uuid::utc_v7()).collect();
+        assert!(ids.windows(2).all(|pair| pair[0] < pair[1]));
     }
 
     #[cfg(feature = "sqlite")]
