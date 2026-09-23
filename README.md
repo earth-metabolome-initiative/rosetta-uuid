@@ -34,7 +34,7 @@ Add this to your `Cargo.toml`. Select the features matching your database or sto
 
 ```toml
 [dependencies]
-rosetta-uuid = { version = "0.1", features = ["diesel", "postgres", "redis", "serde"] }
+rosetta-uuid = { version = "0.2", features = ["diesel", "postgres", "redis", "serde"] }
 ```
 
 ### Example
