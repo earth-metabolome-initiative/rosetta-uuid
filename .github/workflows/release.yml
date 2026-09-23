@@ -5,105 +5,37 @@ on:
     tags:
       - 'v*'
 
-env:
-  CARGO_TERM_COLOR: always
-
 permissions:
-  contents: write
-  id-token: write
+  contents: read
 
 jobs:
-  fmt:
-    name: Format
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rustfmt
-      - run: cargo fmt --all -- --check
-
-  clippy:
-    name: Clippy
+  version:
+    name: Tag Matches Cargo.toml
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
-      - run: cargo clippy --all-features --all-targets -- -D warnings
+      - name: Compare tag and package version
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match Cargo.toml version $version"
+            exit 1
+          fi
 
-  doc:
-    name: Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
-      - name: Check documentation
-        run: cargo doc --no-deps --document-private-items
-        env:
-          RUSTDOCFLAGS: -D warnings
-
-  test:
-    name: Test (all features)
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_HOST_AUTH_METHOD: trust
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
-      - name: Run tests
-        run: cargo test --no-default-features --features "diesel,postgres,sqlite,redis,serde"
-        env:
-          DATABASE_URL: postgres://postgres@localhost:5432/postgres
-          REDIS_URL: redis://127.0.0.1/
-
-  test_wasm:
-    name: Test Wasm
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - name: Install wasm-pack
-        uses: jetli/wasm-pack-action@0d096b08b4e5a7de8c28de67e11e945404e9eefa # v0.4.0
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
-      - name: Run Wasm Tests (Firefox)
-        run: wasm-pack test --headless --firefox
-      - name: Run Wasm Tests with diesel + sqlite (Firefox)
-        run: wasm-pack test --headless --firefox -- --features diesel,sqlite
+  ci:
+    name: CI
+    needs: version
+    uses: ./.github/workflows/ci.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     name: Publish to crates.io
-    needs: [fmt, clippy, doc, test, test_wasm]
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
