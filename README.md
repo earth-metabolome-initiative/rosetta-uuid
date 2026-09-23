@@ -14,7 +14,7 @@ A wrapper implementation of UUID providing binary [`diesel`](https://crates.io/c
 This crate provides a `Uuid` wrapper type that implements various traits based on enabled features:
 
 * **[`diesel`](https://crates.io/crates/diesel)**: Enables Diesel integration.
-  * **`postgres`**: Enables binary `Uuid` support for [PostgreSQL](https://www.postgresql.org/docs/current/datatype-uuid.html).
+  * **`postgres`**: Enables binary `Uuid` support for [PostgreSQL](https://www.postgresql.org/docs/current/datatype-uuid.html). It uses Diesel's `postgres_backend` only, so it links no libpq and works with `diesel-async`. Enable `diesel/postgres` yourself for `PgConnection`.
   * **`sqlite`**: Enables binary `Uuid` support for [SQLite](https://www.sqlite.org/datatype3.html) (stored as BLOB).
 * **[`redis`](https://crates.io/crates/redis)**: Enables `ToRedisArgs` and `FromRedisValue` for easy [Redis](https://redis.io/) storage and retrieval.
 * **[`serde`](https://crates.io/crates/serde)**: Enables serialization and deserialization via [Serde](https://serde.rs/).
